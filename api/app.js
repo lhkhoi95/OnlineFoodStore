@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 // Import Routes
 app.use("/auth", require("./routes/auth"));
 app.use("/products", require("./routes/products"));
+app.use("/orders", require("./routes/orders"));
 
 // ROUTES
 app.get("/", (req, res) => {

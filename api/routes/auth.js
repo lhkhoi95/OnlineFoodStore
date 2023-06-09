@@ -95,6 +95,16 @@ router.patch("/user/:id", async (req, res) => {
   }
 });
 
+// LOGOUT
+router.post("/logout", async (req, res) => {
+  try {
+    res.header("accessToken", "").send("Logged out");
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
 // GET A SPECIFIC USER
 router.get("/user/:id", async (req, res) => {
   try {
@@ -108,4 +118,19 @@ router.get("/user/:id", async (req, res) => {
     });
   }
 });
+
+// DELETE A USER
+router.delete("/user/:id", async (req, res) => {
+  try {
+    // DELETE USER
+    const deletedUser = await User.findByIdAndRemove(req.params.id);
+    if (!deletedUser) return res.status(400).send("User not found");
+
+    return res.send(deletedUser); // Return the deleted user as a response
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
 module.exports = router;
