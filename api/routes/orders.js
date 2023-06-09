@@ -6,7 +6,7 @@ const helper = require("../helpers");
 const { orderIdValidation } = require("../validation/orderValidation");
 
 // GET ALL ORDERS
-router.get("/", async (req, res) => {
+router.get("/", loginRequired, async (req, res) => {
   try {
     const orders = await Order.find();
     res.json(orders);
@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET A SPECIFIC ORDER
-router.get("/:orderId", async (req, res) => {
+router.get("/:orderId", loginRequired, async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId);
     res.json(order);

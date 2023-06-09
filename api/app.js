@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.use("/auth", require("./routes/auth"));
 app.use("/products", require("./routes/products"));
 app.use("/orders", require("./routes/orders"));
+app.use("/cart", require("./routes/cart"));
 
 // ROUTES
 app.get("/", (req, res) => {
