@@ -11,48 +11,40 @@ router.get("/", loginRequired, async (req, res) => {
   try {
     // EXTRACT userId FROM TOKEN
     const userId = helpers.getUserId(req.headers["auth-token"]);
-    const cart = await Cart.find({ user: userId });
-    res.json(cart);
+    const cart = await Cart.findOne({ user: userId });
+    return res.json(cart);
   } catch (error) {
-    res.json({ message: error });
+    return res.status(500).send({ message: error });
   }
 });
 
 // ADD ITEM TO CART OR UPDATE QUANTITY OF EXISTING ITEM
 router.post("/", loginRequired, async (req, res) => {
-  // VALIDATE PRODUCT ID
-  const { error } = cartValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
-  // EXTRACT userId FROM TOKEN
-  const userId = helpers.getUserId(req.headers["auth-token"]);
-
-  // CHECK IF PRODUCT EXISTS, SAVE PRODUCT ID TO AN ARRAY
-  const products = req.body.products;
-
-  products.forEach(async (product) => {
-    const p = await Product.findById(product.productId);
-    if (!p) {
-      return res.status(400).send(`Invalid Product ID: ${product.productId}`);
-    }
-  });
-
-  // CHECK IF CART EXISTS
   try {
-    const existingCart = await Cart.findOne({ user: userId });
+    // VALIDATE PRODUCT ID
+    const error = await cartValidation(req.body);
+    if (error) {
+      return res.status(400).send(error.message);
+    }
+
+    // EXTRACT userId FROM TOKEN
+    const userId = helpers.getUserId(req.headers["auth-token"]);
+
+    // CHECK IF CART EXISTS
+    let existingCart = await Cart.findOne({ user: userId });
+
     if (existingCart) {
+      // CART EXISTS, UPDATE PRODUCTS' QUANTITY
       const productsInCart = existingCart.products;
 
-      // IF PRODUCT ALREADY IN CART, UPDATE THE QUANTITY
-      for (const product of products) {
+      for (const product of req.body.products) {
         const foundProductInCart = productsInCart.find(
           (itemInCart) => itemInCart.productId.toString() === product.productId
         );
-        // UPDATE QUANTITY
+
         if (foundProductInCart) {
           foundProductInCart.quantity = product.quantity;
         } else {
-          // IF PRODUCT NOT IN CART, ADD THE PRODUCT TO THE CART
           productsInCart.push({
             productId: product.productId,
             quantity: product.quantity,
@@ -60,29 +52,53 @@ router.post("/", loginRequired, async (req, res) => {
         }
       }
 
-      // SAVE THE UPDATED CART
       await existingCart.save();
-
-      res.send(existingCart);
+      return res.send(existingCart);
     } else {
-      // CREATE AND SAVE A NEW CART
+      // CART DOES NOT EXIST, CREATE A NEW CART
       const cart = new Cart({
         user: userId,
-        products: products,
+        products: req.body.products,
       });
 
-      try {
-        const savedCart = await cart.save();
-        res.json(savedCart);
-      } catch (error) {
-        res.json({ message: error });
-      }
+      const savedCart = await cart.save();
+      return res.json(savedCart);
     }
   } catch (error) {
-    res.status(500).send({ message: error });
+    return res.status(500).send({ message: error });
   }
 });
 
 // REMOVE ITEM IN CART
+router.delete("/removeProduct/:productId", loginRequired, async (req, res) => {
+  try {
+    const productIdToRemove = req.params.productId;
+    // EXTRACT userId FROM TOKEN
+    const userId = helpers.getUserId(req.headers["auth-token"]);
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) return res.status(400).send("Cart Does Not Exist");
+
+    // REMOVE PRODUCT THAT MATCHES THE PRODUCT ID IN THE CART
+    await cart.products.pull({ productId: productIdToRemove });
+    await cart.save();
+
+    const updatedCart = await Cart.findOne({ user: userId });
+    return res.json(updatedCart);
+  } catch (error) {
+    return res.status(500).send({ message: error });
+  }
+});
+
+// EMPTY CART
+router.delete("/", async (req, res) => {
+  try {
+    // EXTRACT userId FROM TOKEN
+    const userId = helpers.getUserId(req.headers["auth-token"]);
+    const cartToDelete = await Cart.deleteOne({ user: userId });
+    if (cartToDelete) return res.send({ message: "Cart is deleted" });
+  } catch (error) {
+    return res.status(500).send({ message: error });
+  }
+});
 
 module.exports = router;

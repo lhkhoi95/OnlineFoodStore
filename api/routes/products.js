@@ -10,9 +10,9 @@ const {
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find();
-    res.json(products);
+    return res.json(products);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
@@ -20,9 +20,9 @@ router.get("/", async (req, res) => {
 router.get("/:productId", async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId);
-    res.json(product);
+    return res.json(product);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
@@ -33,7 +33,6 @@ router.post("/", loginRequired, async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // CHECK IF USER EXISTS
-
   const product = new Product({
     name: req.body.name,
     price: req.body.price,
@@ -43,9 +42,9 @@ router.post("/", loginRequired, async (req, res) => {
   });
   try {
     const savedProduct = await product.save();
-    res.json(savedProduct);
+    return res.json(savedProduct);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
@@ -64,9 +63,9 @@ router.patch("/:productId", loginRequired, async (req, res) => {
 
     if (!updatedProduct) return res.status(400).send("Product not found");
 
-    res.json(updatedProduct);
+    return res.json(updatedProduct);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
@@ -76,9 +75,12 @@ router.delete("/:productId", loginRequired, async (req, res) => {
     const removedProduct = await Product.deleteOne({
       _id: req.params.productId,
     });
-    res.json(removedProduct);
+    if (removedProduct) {
+      const products = await Product.find();
+      return res.json(products);
+    }
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 

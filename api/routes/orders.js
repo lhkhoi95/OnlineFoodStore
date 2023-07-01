@@ -9,9 +9,9 @@ const { orderIdValidation } = require("../validation/orderValidation");
 router.get("/", loginRequired, async (req, res) => {
   try {
     const orders = await Order.find();
-    res.json(orders);
+    return res.json(orders);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
@@ -19,9 +19,9 @@ router.get("/", loginRequired, async (req, res) => {
 router.get("/:orderId", loginRequired, async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId);
-    res.json(order);
+    return res.json(order);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
@@ -46,9 +46,9 @@ router.post("/", loginRequired, async (req, res) => {
 
   try {
     const savedOrder = await order.save();
-    res.json(savedOrder);
+    return res.json(savedOrder);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
@@ -74,9 +74,9 @@ router.patch("/:orderId", loginRequired, async (req, res) => {
 
     if (!updatedOrder) return res.status(400).send("Invalid Order ID");
 
-    res.json(updatedOrder);
+    return res.json(updatedOrder);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
@@ -86,9 +86,9 @@ router.delete("/:orderId", loginRequired, async (req, res) => {
     const removedOrder = await Order.deleteOne({
       _id: req.params.orderId,
     });
-    res.json(removedOrder);
+    return res.json(removedOrder);
   } catch (error) {
-    res.json({ message: error });
+    return res.json({ message: error });
   }
 });
 
