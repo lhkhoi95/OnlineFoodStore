@@ -1,0 +1,17 @@
+/* QuantityButton.css */
+.quantity-button {
+  display: flex;
+  align-items: center;
+  background-color: red;
+}
+
+.decrement-button,
+.increment-button {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.decrement-button.visible,
+.increment-button.visible {
+  opacity: 1;
+}

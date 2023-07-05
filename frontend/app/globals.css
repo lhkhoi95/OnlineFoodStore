@@ -16,7 +16,12 @@
   }
 }
 
+html {
+  height: 100%;
+}
+
 body {
+  min-height: 100%;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
@@ -26,3 +31,8 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

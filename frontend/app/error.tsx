@@ -1,24 +1,24 @@
-'use client' // Error components must be Client Components
+"use client"; // Error components must be Client Components
 
-import { useEffect } from 'react'
-import PillButton from './components/Button'
+import { useEffect } from "react";
+import PillButton from "./components/Button";
 
 export default function Error({
-    error,
-    reset,
+  error,
+  reset,
 }: {
-    error: Error
-    reset: () => void
+  error: Error;
+  reset: () => void;
 }) {
-    useEffect(() => {
-        // Log the error to an error reporting service
-        console.error(error)
-    }, [error])
+  useEffect(() => {
+    // Log the error to an error reporting service
+    console.error(error);
+  }, [error]);
 
-    return (
-        <div className='flex flex-col items-center justify-center h-[200px]'>
-            <h1 className='text-lg pb-2'>Something went wrong!</h1>
-            <PillButton label='Try again' onClick={() => reset()} />
-        </div>
-    )
+  return (
+    <div className="flex flex-col items-center justify-center h-[200px]">
+      <h1 className="text-lg pb-2">Something went wrong!</h1>
+      <PillButton label="Try again" handleClick={() => reset()} />
+    </div>
+  );
 }
