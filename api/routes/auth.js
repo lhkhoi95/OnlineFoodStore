@@ -64,7 +64,15 @@ router.post("/login", async (req, res) => {
     },
     process.env.JWT_SECRET
   );
-  res.header("accessToken", token).send(token);
+  // res.header("accessToken", token).send(token);
+  return res.json({
+    id: user.id,
+    name: user.name,
+    address: user.address,
+    phone: user.phone,
+    email: user.email,
+    accessToken: token,
+  });
 });
 
 // PARTIAL UPDATE USER

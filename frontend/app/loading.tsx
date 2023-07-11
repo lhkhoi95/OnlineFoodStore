@@ -41,7 +41,7 @@ export default function loading() {
         <p className="text-lg pl-3">All Products</p>
         <div className="flex flex-wrap pt-8">
           {Array.from({ length: 12 }).map((_, idx) => (
-            <ProductSkeleton />
+            <ProductSkeleton key={idx} />
           ))}
         </div>
       </div>

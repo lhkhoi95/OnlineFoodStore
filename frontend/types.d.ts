@@ -1,3 +1,8 @@
+interface RootProps {
+  children: React.ReactNode,
+  // session: any,
+}
+
 type Product = {
   _id: string,
   name: string,
@@ -8,10 +13,20 @@ type Product = {
   date: string,
 }
 
-type ProductsInCart = {
+type ProductInCart = {
   id: string,
   price: number,
   quantity: number,
+}
+
+type Cart = {
+  products: {
+    id: string,
+    price: number,
+    quantity: number,
+  }[],
+  cartCount: number,
+  currentTotal: number,
 }
 
 type PillButtonProps = {

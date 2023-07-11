@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PillButton from "./Button";
 import { useDispatch } from "react-redux";
 import { QuantityButton } from "./QuantityButton";
-import { addProductToCart } from "@/utils/cartStorage";
+import { getQuantityById } from "@/utils/cartStorage";
+import stringToUSCurrency from "../helpers/convertCurrency";
 
 function displayName(prodName: string) {
   if (prodName.length > 60) {
@@ -16,6 +17,9 @@ function displayName(prodName: string) {
 
 export default function ProductCard({ product }: { product: Product }) {
   const [showQuantityButton, setShowQuantityButton] = useState<boolean>(false);
+  useEffect(() => {
+    if (getQuantityById(product._id) > 0) setShowQuantityButton(true);
+  }, []);
 
   const dispatch = useDispatch();
 
@@ -29,9 +33,8 @@ export default function ProductCard({ product }: { product: Product }) {
       type = "DECREMENT_CART_COUNT";
     }
 
-    // Add to local storage
-    addProductToCart(product);
-    const addedProduct: ProductsInCart = {
+    // Update store
+    const addedProduct: ProductInCart = {
       id: product._id,
       price: product.price,
       quantity: 1,
@@ -41,6 +44,15 @@ export default function ProductCard({ product }: { product: Product }) {
       payload: addedProduct,
     });
   }
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // This code will only run on the client-side
+      console.log("Client-side rendering");
+    } else {
+      // This code will run on the server-side
+      console.log("Server-side rendering");
+    }
+  }, []);
 
   return (
     <div
@@ -75,7 +87,9 @@ export default function ProductCard({ product }: { product: Product }) {
             />
           )}
         </div>
-        <div className="font-bold text-base mt-1">{`$${product.price}`}</div>
+        <div className="font-bold text-base mt-1">{`${stringToUSCurrency(
+          product.price
+        )}`}</div>
         <div className="text-gray-300 font-bold pt-1">
           {product.stock === 0 ? (
             <div className="text-red-500">Out of Stock</div>
