@@ -25,15 +25,6 @@ export const QuantityButton: React.FC<QuantityButtonProps> = ({
       });
     }
   }, [quantity]);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      // This code will only run on the client-side
-      console.log("Client-side rendering");
-    } else {
-      // This code will run on the server-side
-      console.log("Server-side rendering");
-    }
-  }, []);
   const largeQuantityButton = (
     <>
       <button
@@ -48,9 +39,8 @@ export const QuantityButton: React.FC<QuantityButtonProps> = ({
       <span className="w-[10px]">{quantity}</span>
       <button
         disabled={quantity >= product.stock}
-        className={`bg-${
-          quantity >= product.stock ? "slate-600" : "blue-500"
-        } rounded-full p-2 w-[40px]`}
+        className={`bg-${quantity >= product.stock ? "slate-600" : "blue-500"
+          } rounded-full p-2 w-[40px]`}
         onClick={() => {
           {
             setQuantity(quantity + 1);
@@ -70,11 +60,10 @@ export const QuantityButton: React.FC<QuantityButtonProps> = ({
   );
   return (
     <div
-      className={`flex items-center h-[40px] justify-between bg-blue-600 rounded-full ${
-        isHovered
+      className={`flex items-center h-[40px] justify-between bg-blue-600 rounded-full ${isHovered
           ? "w-[120px] transition-width duration-200"
           : "w-[40px] transition-width duration-200"
-      }`}
+        }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

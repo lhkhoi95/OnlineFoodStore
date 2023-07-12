@@ -44,15 +44,6 @@ export default function ProductCard({ product }: { product: Product }) {
       payload: addedProduct,
     });
   }
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      // This code will only run on the client-side
-      console.log("Client-side rendering");
-    } else {
-      // This code will run on the server-side
-      console.log("Server-side rendering");
-    }
-  }, []);
 
   return (
     <div

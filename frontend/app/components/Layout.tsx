@@ -12,28 +12,26 @@ const poppins = Poppins({
 });
 
 export default function Layout({ children }: RootProps) {
-  const [reduxStore, setReduxStore] =
-    useState<Store<unknown, AnyAction>>(store);
-
+  // Define variable to store redux store with default value to null
+  const [reduxStore, setReduxStore] = useState<Store<any, AnyAction> | null>(null);
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       setReduxStore(store);
     }
-  }, []);
+  }, [reduxStore]);
 
   return (
-    <Provider store={reduxStore}>
-      <html lang="en">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta charSet="UTF-8" />
-        <title>Grocer</title>
-
-        <body className={`${poppins.className} flex flex-col text-sm `}>
+    <html lang="en">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta charSet="UTF-8" />
+      <title>Grocer</title>
+      <body className={`${poppins.className} flex flex-col text-sm `}>
+        {reduxStore && <Provider store={reduxStore}>
           <LayoutProvider>
             <main>{children}</main>
           </LayoutProvider>
-        </body>
-      </html>
-    </Provider>
+        </Provider>}
+      </body>
+    </html>
   );
 }

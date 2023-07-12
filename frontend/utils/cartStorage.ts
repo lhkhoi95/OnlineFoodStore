@@ -10,10 +10,6 @@ function getTotal() {
   return sum;
 }
 
-function setTotal(total: number) {
-  localStorage.setItem("currentTotal", total.toString());
-}
-
 function getQuantity() {
   const cart: ProductInCart[] =
     JSON.parse(localStorage.getItem("cart") || "null") || [];
@@ -116,4 +112,4 @@ function getProductsInCart() {
   return allProducts;
 }
 
-export { getTotal, setTotal, addProductToCart, subtractProductFromCart, getProductsInCart, getQuantity, getQuantityById };
+export { getTotal, addProductToCart, subtractProductFromCart, getProductsInCart, getQuantity, getQuantityById };

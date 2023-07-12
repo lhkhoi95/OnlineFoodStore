@@ -1,20 +1,20 @@
 import { getQuantity, getTotal } from "@/utils/cartStorage";
 import Link from "next/link";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import stringToUSCurrency from "../helpers/convertCurrency";
+import { createSelector } from 'reselect';
 
 const Cart = () => {
-  let [cartCount, currentTotal] = [getQuantity(), getTotal()];
+  const selectCartCount = (state: { cartCount: number; currentTotal: number }) => state.cartCount;
+  const selectCurrentTotal = (state: { cartCount: number; currentTotal: number }) => state.currentTotal;
 
-  [cartCount, currentTotal] = useSelector(
-    useMemo(() => {
-      return (state: { cartCount: number; currentTotal: number }) => [
-        state.cartCount,
-        state.currentTotal,
-      ];
-    }, [currentTotal, cartCount])
+  const selectCartData = createSelector(
+    [selectCartCount, selectCurrentTotal],
+    (cartCount, currentTotal) => [cartCount, currentTotal]
   );
+
+  const [cartCount, currentTotal] = useSelector(selectCartData);
 
   return (
     <>
@@ -40,13 +40,13 @@ const Cart = () => {
                 d="M6 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0h8m-8 0-1-4m9 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-9-4h10l2-7H3m2 7L3 4m0 0-.792-3H1"
               />
             </svg>
-            <div className="absolute text-xs top-[-15px] right-[-15px] bg-yellow-400 text-black rounded-full w-6 h-6 flex items-center justify-center">
+            <div className="absolute text-xs top-[-15px] right-[-15px] bg-yellow-400 text-black rounded-full w-6 h-6 flex items-center justify-center tracking-wider">
               {cartCount && (cartCount > 99 ? "99+" : cartCount)}
             </div>
           </span>
 
-          <div className="text-sm pt-1">
-            {currentTotal && stringToUSCurrency(currentTotal)}
+          <div className="text-sm pt-1 tracking-wider">
+            {currentTotal ? stringToUSCurrency(currentTotal) : "$0.00"}
           </div>
         </div>
       </Link>

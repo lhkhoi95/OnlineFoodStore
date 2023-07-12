@@ -5,15 +5,6 @@ import React, { useEffect } from "react";
 import Cart from "./Cart";
 
 const Header = () => {
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      // This code will only run on the client-side
-      console.log("Client-side rendering");
-    } else {
-      // This code will run on the server-side
-      console.log("Server-side rendering");
-    }
-  }, []);
   return (
     <header className="bg-gray-800 text-white text-xl p-2 pl-4 pr-8">
       <nav className="bg-gray-800">

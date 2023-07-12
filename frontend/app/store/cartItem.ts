@@ -1,8 +1,13 @@
-import { addProductToCart, getProductsInCart, subtractProductFromCart } from "@/utils/cartStorage";
+import { addProductToCart, getProductsInCart, getQuantity, getTotal, subtractProductFromCart } from "@/utils/cartStorage";
 import { configureStore } from "@reduxjs/toolkit";
 
 
-const initialState = getProductsInCart();
+const initialState = {
+  products: typeof window !== 'undefined' ? getProductsInCart()?.products : [],
+  cartCount: typeof window !== 'undefined' ? getQuantity() : 0,
+  currentTotal: typeof window !== 'undefined' ? getTotal() : 0.0,
+};
+
 
 const reducer = (state: any = initialState, action: any) => {
   const productObj: ProductInCart = action.payload;
