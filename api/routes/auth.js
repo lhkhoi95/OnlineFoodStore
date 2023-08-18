@@ -46,15 +46,15 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   // VALIDATE
   const { error } = loginValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(401).send(error.details[0].message);
 
   // CHECK IF USER IS ALREADY IN THE DATABASE
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Email is not found");
+  if (!user) return res.status(401).send("Email is not found");
 
   // PASSWORD IS CORRECT
   const validPassword = await bcrypt.compare(req.body.password, user.password);
-  if (!validPassword) return res.status(400).send("Password is incorrect");
+  if (!validPassword) return res.status(401).send("Password is incorrect");
 
   // CREATE and ASSIGN A JWT
   const token = jwt.sign(

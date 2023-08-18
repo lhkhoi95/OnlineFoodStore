@@ -1,6 +1,9 @@
 import axios from "axios";
 
 export async function updateDBCart({ products, user }: { products: ProductInCart[], user: User }) {
+    // remove products with quantity 0
+    products = products.filter((product) => product.quantity > 0);
+
     if (products.length === 0) return null;
 
     const headers = {

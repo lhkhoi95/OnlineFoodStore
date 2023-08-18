@@ -1,3 +1,6 @@
+import { calculateCartCount, calculateCartTotal } from "@/app/helpers/cart";
+import { clearDBCart, updateDBCart } from "@/lib/cart";
+
 function getTotal() {
   const cart: ProductInCart[] =
     JSON.parse(localStorage.getItem("cart") || "null") || [];
@@ -59,10 +62,10 @@ export function addProductToCart(product: ProductInCart) {
         cart[index].quantity += product.quantity;
         localStorage.setItem("cart", JSON.stringify(cart));
         // Delete the product from the cart if quantity is going to be 0.
-        if (cart[index].quantity === 0) {
-          cart.splice(index, 1);
-          localStorage.setItem("cart", JSON.stringify(cart));
-        }
+        // if (cart[index].quantity === 0) {
+        //   cart.splice(index, 1);
+        //   localStorage.setItem("cart", JSON.stringify(cart));
+        // }
       }
     }
   } catch (error) {
@@ -118,6 +121,78 @@ export function getLocalCart() {
 
 export function clearLocalCart() {
   localStorage.removeItem("cart");
+}
+
+export async function mergeCarts(localCart: Cart | null, dbCart: Cart, user: User, isAdding: boolean) {
+  // If there is a local cart, merge with database cart
+  if (localCart && localCart.products.length > 0) {
+    console.log("THERE ARE LOCAL CART and DB CART, MERGING...");
+    localCart.products.forEach((localProduct) => {
+      const index = dbCart.products.findIndex(p => p.productId === localProduct.productId);
+      if (index === -1) {
+        // Add new product 
+        dbCart.products.push(localProduct);
+      } else {
+        // Update quantity
+        let newQty: number = 0;
+        if (isAdding) {
+          newQty = Math.max(dbCart.products[index].quantity, localProduct.quantity);
+        } else {
+          newQty = Math.min(dbCart.products[index].quantity, localProduct.quantity);
+        }
+
+        if (newQty > 0) {
+          dbCart.products[index].quantity = newQty;
+        } else {
+          // Remove product
+          dbCart.products.splice(index, 1);
+        }
+      }
+    });
+    // Recalculate cart totals
+    dbCart.cartCount = calculateCartCount(dbCart.products);
+    dbCart.currentTotal = calculateCartTotal(dbCart.products);
+    try {
+      setLocalAndDbCart(dbCart, user);
+
+      return dbCart;
+    } catch (err) {
+      console.error('Error updating cart', err);
+      throw new Error("Error updating cart");
+    }
+  } else {
+    // If no local cart, return database cart
+    return dbCart;
+  }
+}
+
+export async function setLocalAndDbCart(cart: Cart, user: User) {
+  // Clear local cart  
+  clearLocalCart();
+  // Set new local cart
+  setLocalCart(cart);
+  try {
+    // Clear database cart
+    await clearDBCart(user.accessToken);
+    // Update database
+    await updateDBCart({
+      products: cart.products,
+      user: user,
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error setting local and database carts");
+  }
+
+}
+
+export function isSameCart(localCart: Cart | null, dbCart: Cart) {
+  if (localCart?.products.length !== dbCart.products.length) return false;
+  for (let i = 0; i < localCart.products.length; i++) {
+    if (localCart.products[i].productId !== dbCart.products[i].productId) return false;
+    if (localCart.products[i].quantity !== dbCart.products[i].quantity) return false;
+  }
+  return true;
 }
 
 export { getTotal, subtractProductFromCart, getQuantity, getQuantityById };

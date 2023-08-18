@@ -1,11 +1,11 @@
 import { create } from 'zustand';
-import { clearDBCart, getCartFromDB, removeProductFromDB, updateDBCart } from '@/lib/cart';
-import { addProductToCart, clearLocalCart, getLocalCart, setLocalCart } from '@/utils/cartStorage';
-import { calculateCartCount, calculateCartTotal } from '../helpers/cart';
+import { getCartFromDB } from '@/lib/cart';
+import { addProductToCart, getLocalCart, isSameCart, mergeCarts, setLocalAndDbCart } from '@/utils/cartStorage';
 
 interface GrocerState {
     cart: Cart | null;
     isLoading: boolean;
+    isAdding: boolean;
     setCart: () => Promise<void>;
     addToStore: (products: ProductInCart[]) => void;
     getQuantityByProductId: (productId: string) => number;
@@ -13,67 +13,10 @@ interface GrocerState {
     setUser: (user: User | null) => void;
 }
 
-function isSameCart(localCart: Cart | null, dbCart: Cart) {
-    if (localCart?.products.length !== dbCart.products.length) return false;
-    for (let i = 0; i < localCart.products.length; i++) {
-        if (localCart.products[i].productId !== dbCart.products[i].productId) return false;
-        if (localCart.products[i].quantity !== dbCart.products[i].quantity) return false;
-    }
-    return true;
-}
-
-async function mergeCarts(localCart: Cart | null, dbCart: Cart, user: User) {
-    // If there is a local cart, merge with database cart
-    if (localCart && localCart.products.length > 0) {
-        console.log("THERE ARE LOCAL CART and DB CART, MERGING...");
-        localCart.products.forEach((product) => {
-            const index = dbCart.products.findIndex(p => p.productId === product.productId);
-            if (index === -1) {
-                // Add new product 
-                dbCart.products.push(product);
-            } else {
-                // Update quantity
-                const newQty = dbCart.products[index].quantity + product.quantity;
-
-                if (newQty > 0) {
-                    dbCart.products[index].quantity = newQty;
-                } else {
-                    // Remove product
-                    dbCart.products.splice(index, 1);
-                }
-            }
-        });
-        // Recalculate cart totals
-        dbCart.cartCount = calculateCartCount(dbCart.products);
-        dbCart.currentTotal = calculateCartTotal(dbCart.products);
-        try {
-            // Clear local cart  
-            clearLocalCart();
-            // Set new local cart
-            setLocalCart(dbCart);
-
-            // Clear database cart
-            await clearDBCart(user.accessToken);
-            // Update database
-            await updateDBCart({
-                products: dbCart.products,
-                user: user,
-            });
-
-            return dbCart;
-        } catch (err) {
-            console.error('Error updating cart', err);
-            throw err;
-        }
-    } else {
-        // If no local cart, return database cart
-        return dbCart;
-    }
-}
-
 export const useGrocerStore = create<GrocerState>((set, get) => ({
     cart: null,
     isLoading: true,
+    isAdding: true,
     setCart: async () => {
         set({ isLoading: true });
         const user = get().user;
@@ -84,13 +27,18 @@ export const useGrocerStore = create<GrocerState>((set, get) => ({
                 const dbCart = await getCartFromDB(user.accessToken);
                 // If there is a cart in the database, merge with local cart
                 if (dbCart && dbCart.products.length > 0 && !isSameCart(localCart, dbCart)) {
-                    const updatedCart = await mergeCarts(localCart, dbCart, user);
+                    const updatedCart = await mergeCarts(localCart, dbCart, user, get().isAdding);
                     set({ cart: updatedCart, isLoading: false });
-                    console.log("USER IS LOGGED IN", "THERE IS DB CART", get().cart);
+                    console.log("USER IS LOGGED IN", "THERE IS DB CART && NOT SAME AS LOCAL CART", get().cart);
                 } else {
                     // If no cart in database, return local cart
                     set({ cart: localCart, isLoading: false });
-                    console.log("USER IS LOGGED IN", "THERE IS NO DB CART", get().cart);
+                    // Update database and localStorage carts
+                    if (localCart && localCart.products.length > 0) {
+                        await setLocalAndDbCart(localCart, user);
+                    }
+
+                    console.log("USER IS LOGGED IN", "THERE IS NO DB CART OR CARTS ARE THE SAME", get().cart);
                 }
             } catch (err) {
                 // Fall back to local cart if error
@@ -102,8 +50,11 @@ export const useGrocerStore = create<GrocerState>((set, get) => ({
         }
     },
     addToStore: (products) => {
+        set({ isLoading: true });
         // ADD TO LOCAL STORAGE
         products.forEach((prod) => {
+            if (prod.quantity < 0) set({ isAdding: false })
+            else set({ isAdding: true })
             addProductToCart(prod);
         })
     },

@@ -8,6 +8,8 @@ export default function Login() {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -18,8 +20,12 @@ export default function Login() {
       redirect: false,
       callbackUrl: "http://localhost:3001/",
     });
+    console.log(result)
     if (result?.error) {
       console.log(result.error);
+      if (result.error === "401") {
+        setError("Invalid credentials");
+      }
     } else {
       window.location.href = "/";
     }
@@ -32,6 +38,10 @@ export default function Login() {
           <h5 className="text-xl font-medium text-gray-900 dark:text-white">
             Sign in
           </h5>
+          {error !== "" && (
+            <div className="text-red-500 text-sm font-medium">{error}</div>
+          )}
+          <div></div>
           <div>
             <label
               htmlFor="email"
@@ -100,8 +110,8 @@ export default function Login() {
           <button
             type="submit"
             className={`w-full text-whit focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center  ${isLoading
-                ? "bg-gray-700 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
-                : "bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              ? "bg-gray-700 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+              : "bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               }`}
             disabled={isLoading}
           >

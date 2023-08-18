@@ -3,6 +3,8 @@ import { AuthOptions as NextAuthOptions, User } from "next-auth/core/types";
 import NextAuth from "next-auth/next";
 import Credentials from "next-auth/providers/credentials";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
@@ -20,19 +22,16 @@ const authOptions: NextAuthOptions = {
         const { email, password } = credentials;
 
         try {
-          const response: AxiosResponse<any, any> = await axios.post(
-            'http://localhost:3000/auth/login',
-            { email, password },
-          );
+          const response: AxiosResponse = await axios.post(`${API_URL}/auth/login`, { email, password });
 
           const user = response.data as User;
 
           if (user) return user;
           return null;
         } catch (err: any) {
-          console.error(err.response.data);
+          console.log("ERROR", err.response.data);
 
-          throw new Error(err.response.data);
+          throw new Error(err.response.status);
         }
       }
     })
