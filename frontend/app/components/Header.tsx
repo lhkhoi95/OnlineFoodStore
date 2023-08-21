@@ -5,10 +5,20 @@ import { Cart } from "./Cart";
 import { signOut } from "next-auth/react";
 import SearchBar from "./SearchBar";
 import { useGrocerStore } from "../store/store";
+import { clearLocalCart } from "@/utils/cartStorage";
+import logout from "@/lib/user";
 
 const Header = () => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const user = useGrocerStore((state) => state.user);
+
+  const handleLogout = async (accessToken: string) => {
+    clearLocalCart();
+    // Blacklist the accessToken in the backend
+    await logout(accessToken);
+    // Sign out from the frontend
+    signOut();
+  };
 
   return (
     <header className="bg-gray-800 text-white text-xl p-2 pl-4 pr-8">
@@ -51,9 +61,7 @@ const Header = () => {
                           View Profile
                         </Link>
                         <button
-                          onClick={() => {
-                            signOut();
-                          }}
+                          onClick={() => handleLogout(user.accessToken)}
                           className="block py-1 px-2 hover:bg-gray-500 w-full text-left"
                         >
                           Logout

@@ -46,28 +46,3 @@ type QuantityButtonProps = {
   product: Product,
   showQuantityButton: React.Dispatch<React.SetStateAction<any>>,
 };
-
-interface RootState {
-  cartCount: number;
-  currentTotal: number;
-};
-
-interface IncrementCartCountAction {
-  type: "INCREMENT_CART_COUNT";
-  payload: {
-    id: string;
-    price: number;
-    quantity: number;
-  };
-}
-
-interface DecrementCartCountAction {
-  type: "DECREMENT_CART_COUNT";
-  payload: {
-    id: string;
-    price: number;
-    quantity: number;
-  };
-}
-
-type CartActionTypes = IncrementCartCountAction | DecrementCartCountAction;

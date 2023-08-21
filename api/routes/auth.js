@@ -2,6 +2,8 @@ const router = require("express").Router();
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const loginRequired = require("./verifyToken");
+const BlackListTokens = require("../models/BlackListTokens");
 const {
   registerValidation,
   loginValidation,
@@ -104,9 +106,18 @@ router.patch("/user/:id", async (req, res) => {
 });
 
 // LOGOUT
-router.post("/logout", async (req, res) => {
+router.post("/logout", loginRequired, async (req, res) => {
   try {
-    res.header("accessToken", "").send("Logged out");
+    // BLACKLIST TOKEN
+    const token = req.headers["auth-token"];
+
+    // ADD TOKEN TO BLACKLIST
+    const blackListedToken = new BlackListTokens({
+      token: token,
+    });
+    await blackListedToken.save();
+
+    return res.send("Logged out");
   } catch (error) {
     console.error(error);
     return res.status(500).send("Internal Server Error");
