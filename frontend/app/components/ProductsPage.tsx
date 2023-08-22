@@ -12,12 +12,16 @@ export const ProductsPage = () => {
   const products: Product[] = data;
 
   return (
-    <div>
-      <p className="text-lg pl-3 pt-10">All Products ({products.length})</p>
-      <div className="flex flex-wrap justify-center pt-2 mx-auto">
-        {products.map((product: Product) => (
-          <ProductCard key={product._id} product={product} />
+    <div className="mx-5 md:mx-20 lg:mx-26 xl:mx-56">
+      <p className="text-lg font-medium text-center py-5">All Drinks ({products.length})</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 justify-items-center align-center">
+
+        {products.map(product => (
+          <div className="" key={product._id}>
+            <ProductCard product={product} />
+          </div>
         ))}
+
       </div>
     </div>
   );

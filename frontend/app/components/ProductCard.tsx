@@ -47,48 +47,51 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <div
       key={product._id}
-      className="flex items-center h-[380px] w-[250px] m-3"
+      className="flex items-center h-[380px] w-[250px] m-3 shadow-2xl rounded-xl bg-[#E6CAB1] border-2 border-[#E6D4C3] hover:border-[#E6CAB1] transition duration-200"
     >
-      <div className="p-6 h-[380px] w-[250px] bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+      <div className="h-[380px] w-[250px] bg-[#E6CAB1] rounded-xl">
         <Link href={`/product/${product._id}`}>
-          <div className="group rounded-lg overflow-hidden">
+          <div className="group rounded-lg overflow-hidden bg-[#E6D4C3]">
             <Image
               src={product.image[0]}
-              width={500}
-              height={500}
-              alt={product.name}
+              width={200}
+              height={300}
+              alt="Image by photographeeasia from Freepik"
               priority={true}
               title={product.name}
-              className="inset-0 h-full w-full object-cover transition duration-200 group-hover:scale-110"
+              className="inset-0 h-[200px] w-[300px] object-scale-down transition duration-200 group-hover:scale-110"
             />
           </div>
         </Link>
-        <div className="mt-2">
-          {showQuantityButton ? (
-            <QuantityButton
-              handleClick={handleAddToCart}
-              product={product}
-              showQuantityButton={setShowQuantityButton}
-            />
-          ) : (
-            <PillButton
-              label="Add to Cart"
-              disable={product.stock === 0 ? true : false}
-              handleClick={() => handleAddToCart(true, product)}
-            />
-          )}
+        <div className="p-6">
+          <div className="font-bold mt-1">{`${stringToUSCurrency(
+            product.price
+          )}`}</div>
+          <div className="text-gray-300 pt-1">
+            {product.stock === 0 ? (
+              <div className="text-red-500">Out of Order</div>
+            ) : (
+              <div className="text-green-800">Available</div>
+            )}
+          </div>
+          <div className="text-lg font-sans text-sand-400">{product.name}</div>
+          <div className="mt-2">
+            {showQuantityButton ? (
+              <QuantityButton
+                handleClick={handleAddToCart}
+                product={product}
+                showQuantityButton={setShowQuantityButton}
+              />
+            ) : (
+              <PillButton
+                label="Add to Cart"
+                disable={product.stock === 0 ? true : false}
+                handleClick={() => handleAddToCart(true, product)}
+              />
+            )}
+          </div>
         </div>
-        <div className="font-bold text-base mt-1">{`${stringToUSCurrency(
-          product.price
-        )}`}</div>
-        <div className="text-gray-300 font-bold pt-1">
-          {product.stock === 0 ? (
-            <div className="text-red-500">Out of Stock</div>
-          ) : (
-            <div className="text-green-500">In Stock</div>
-          )}
-        </div>
-        <div className="line-clamp-2">{product.name}</div>
+
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
-import { Cart } from "./Cart";
+import { CartIcon } from "./CartIcon";
 import { signOut } from "next-auth/react";
 import SearchBar from "./SearchBar";
 import { useGrocerStore } from "../store/store";
@@ -21,26 +21,24 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-gray-800 text-white text-xl p-2 pl-4 pr-8">
-      <nav className="bg-gray-800">
+    <header className="bg-[#FCAE1E] text-[#333333] shadow-md shadow-amber-300 text-xl p-2 pl-4 pr-8 w-full">
+      <nav className="bg-[#FCAE1E] mx-3">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="">
             <Image
               src="/images/logo.png"
               alt="logo"
               loading="eager"
-              width={70}
-              height={70}
-              className="rounded-xl"
+              width={100}
+              height={100}
+              className="rounded-xl shadow-2xl hover:scale-110"
               priority
             />
           </Link>
-
-          <SearchBar />
           <div className="flex items-center space-x-4">
             <div
+              className="relative hover:bg-amber-200 rounded-2xl p-2"
               title={user ? "View Profile" : "Login"}
-              className="relative hover:bg-slate-600 rounded-2xl p-2"
               onMouseEnter={() => {
                 setIsHovered(true);
               }}
@@ -51,18 +49,21 @@ const Header = () => {
               <div className="hidden md:block">
                 {user ? (
                   <div className="text-sm">
-                    Hi, {user.name}
+                    <div className="mr-2 relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-[#8b5f42]">
+                      <span className="font-bold text-[#84593C] dark:text-gray-300">{user.name[0]}</span>
+                    </div>
+                    {user.name}
                     {isHovered && (
-                      <div className="absolute top-[35px] right-0 bg-gray-600 rounded-md shadow-md p-2 text-sm w-[120px]">
+                      <div className="absolute top-[55px] right-0 bg-amber-500 rounded-md shadow-md p-2 text-sm w-[120px]">
                         <Link
                           href="/profile"
-                          className="block py-1 px-2 hover:bg-gray-500 w-full text-left"
+                          className="block py-1 px-2 hover:bg-amber-200 w-full text-left"
                         >
                           View Profile
                         </Link>
                         <button
                           onClick={() => handleLogout(user.accessToken)}
-                          className="block py-1 px-2 hover:bg-gray-500 w-full text-left"
+                          className="block py-1 px-2 hover:bg-amber-200 w-full text-left"
                         >
                           Logout
                         </button>
@@ -94,7 +95,7 @@ const Header = () => {
                 )}
               </div>
             </div>
-            <Cart />
+            <CartIcon />
           </div>
         </div>
       </nav>

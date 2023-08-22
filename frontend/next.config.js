@@ -7,6 +7,7 @@ const nextConfig = {
       "localhost",
       "picsum.photos",
       "example.com",
+      "res.cloudinary.com",
     ], // <== Domain name
   },
 };

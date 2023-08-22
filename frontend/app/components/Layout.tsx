@@ -32,7 +32,7 @@ export default function Layout({ children }: ComponentProps) {
     <html lang="en">
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta charSet="UTF-8" />
-      <title>Grocer</title>
+      <title>VinaTea</title>
       <body className={`${poppins.className} flex flex-col text-sm `}>
         <LayoutProvider>
           <main>{children}</main>
