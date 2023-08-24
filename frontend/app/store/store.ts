@@ -2,18 +2,19 @@ import { create } from 'zustand';
 import { getCartFromDB } from '@/lib/cart';
 import { addProductToCart, getLocalCart, isSameCart, mergeCarts, setLocalAndDbCart } from '@/utils/cartStorage';
 
-interface GrocerState {
+interface VinaTeaState {
     cart: Cart | null;
     isLoading: boolean;
     isAdding: boolean;
     setCart: () => Promise<void>;
     addToStore: (products: ProductInCart[]) => void;
     getQuantityByProductId: (productId: string) => number;
-    user: User | null;
-    setUser: (user: User | null) => void;
+    user: NextAuthUser | null;
+    setUser: (user: NextAuthUser | null) => void;
+    clearStore: () => void;
 }
 
-export const useGrocerStore = create<GrocerState>((set, get) => ({
+export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
     cart: null,
     isLoading: true,
     isAdding: true,
@@ -67,4 +68,5 @@ export const useGrocerStore = create<GrocerState>((set, get) => ({
     },
     user: null,
     setUser: (user) => set({ user }),
+    clearStore: () => set({ user: null, cart: null, isLoading: true, isAdding: true }),
 }));

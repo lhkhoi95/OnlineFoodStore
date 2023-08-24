@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useGrocerStore } from "../store/store";
+import { useVinaTeaStore } from "../store/store";
 
 export const QuantityButton: React.FC<QuantityButtonProps> = ({
   handleClick,
   product,
   showQuantityButton,
 }) => {
-  const getQuantityById = useGrocerStore((state) => state.getQuantityByProductId);
+  const getQuantityById = useVinaTeaStore((state) => state.getQuantityByProductId);
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const isLoading = useGrocerStore((state) => state.isLoading);
+  const isLoading = useVinaTeaStore((state) => state.isLoading);
   const [quantity, setQuantity] = useState<number>(getQuantityById(product._id));
   const isDisabled = quantity >= product.stock || isLoading;
 
@@ -24,7 +24,7 @@ export const QuantityButton: React.FC<QuantityButtonProps> = ({
       <button
         disabled={isLoading}
         className={`${isLoading ? "bg-[#84593cac]" : "bg-[#aa6b42]"
-          } rounded-full p-2 w-[40px]`}
+          } rounded-full p-2 w-[40px] h-[40px]`}
         onClick={() => {
           setQuantity(quantity - 1);
           handleClick(false, product);
@@ -36,7 +36,7 @@ export const QuantityButton: React.FC<QuantityButtonProps> = ({
       <button
         disabled={isDisabled}
         className={`${isDisabled ? "bg-[#482e1edb]" : "bg-[#aa6b42]"
-          } rounded-full p-2 w-[40px]`}
+          } rounded-full p-2 w-[40px] h-[40px]`}
         onClick={() => {
           {
             setQuantity(quantity + 1);

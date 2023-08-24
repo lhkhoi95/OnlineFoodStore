@@ -3,13 +3,14 @@ interface ComponentProps {
   // session: any,
 }
 
-type User = {
+type NextAuthUser = {
   id: string;
   name: string;
   email: string;
   image?: string | null;
   address: string;
   accessToken: string;
+  loginWithProvider: boolean;
 }
 
 type Product = {

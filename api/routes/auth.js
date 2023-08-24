@@ -10,6 +10,19 @@ const {
   updateValidation,
 } = require("../validation/userValidation");
 
+function getUserObject(user, loginWithProvider, token) {
+  return {
+    id: user.id,
+    name: user.name,
+    loginWithProvider: loginWithProvider,
+    address: user.address,
+    phone: user.phone,
+    email: user.email,
+    avatar: user.avatar,
+    accessToken: token,
+  };
+}
+
 // REGISTER
 router.post("/register", async (req, res) => {
   // VALIDATION
@@ -44,15 +57,28 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// LOGIN
+// LOGIN WITH CREDENTIALS
 router.post("/login", async (req, res) => {
   // VALIDATE
   const { error } = loginValidation(req.body);
   if (error) return res.status(401).send(error.details[0].message);
 
+  const loginWithProvider = req.body.loginWithProvider;
+  if (loginWithProvider)
+    return res
+      .status(401)
+      .send("This route requires loginWithProvider to be false");
+
   // CHECK IF USER IS ALREADY IN THE DATABASE
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(401).send("Email is not found");
+  if (!user && !loginWithProvider)
+    return res.status(401).send("Email is not found");
+
+  // CHECK IF USER IS BLACKLISTED
+  const blackListedToken = await BlackListTokens.findOne({
+    token: req.headers["auth-token"],
+  });
+  if (blackListedToken) return res.status(401).send("Token is blacklisted");
 
   // PASSWORD IS CORRECT
   const validPassword = await bcrypt.compare(req.body.password, user.password);
@@ -67,14 +93,58 @@ router.post("/login", async (req, res) => {
     process.env.JWT_SECRET
   );
   // res.header("accessToken", token).send(token);
-  return res.json({
-    id: user.id,
-    name: user.name,
-    address: user.address,
-    phone: user.phone,
-    email: user.email,
-    accessToken: token,
-  });
+  return res.json(getUserObject(user, loginWithProvider, token));
+});
+
+// LOGIN WITH PROVIDER
+router.post("/loginWithProvider", async (req, res) => {
+  // VALIDATE
+  const { error } = loginValidation(req.body);
+  if (error) return res.status(401).send(error.details[0].message);
+
+  const loginWithProvider = req.body.loginWithProvider;
+  if (!loginWithProvider)
+    return res
+      .status(401)
+      .send("This route requires loginWithProvider to be true");
+
+  // IF FIRST TIME LOGIN WITH PROVIDER, REGISTER NEW USER
+  let user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    // REGISTER THE CURRENT USER
+    const providerUser = new User({
+      name: req.body.name,
+      email: req.body.email,
+      loginWithProvider: true,
+      avatar: req.body.avatar,
+    });
+
+    try {
+      user = await providerUser.save();
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error);
+    }
+  }
+
+  // CHECK IF USER ALREADY HAD A LOCAL ACCOUNT
+  if (!user.loginWithProvider)
+    return res
+      .status(401)
+      .send(
+        "You have a local account. Please login with your email and password."
+      );
+
+  // CREATE and ASSIGN A JWT
+  const token = jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET
+  );
+  return res.json(getUserObject(user, loginWithProvider, token));
 });
 
 // PARTIAL UPDATE USER
@@ -124,11 +194,26 @@ router.post("/logout", loginRequired, async (req, res) => {
   }
 });
 
-// GET A SPECIFIC USER
-router.get("/user/:id", async (req, res) => {
+// GET A SPECIFIC USER BY ID
+router.get("/user/getUserById/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id); // Find the user by id
     if (!user) return res.status(400).send("User not found"); // If user not found, return 400 Bad Request
+    return res.send(user); // Return the user as a response
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      message: error.message || "Internal Server Error",
+    });
+  }
+});
+
+// GET A SPECIFIC USER BY EMAIL
+router.get("/user/getUserByEmail", async (req, res) => {
+  try {
+    console.log(req.query.email);
+    const user = await User.findOne({ email: req.query.email }); // Find the user by email
+    if (!user) return res.status(200).send("null"); // If user not found, return 400 Bad Request
     return res.send(user); // Return the user as a response
   } catch (error) {
     console.error(error);

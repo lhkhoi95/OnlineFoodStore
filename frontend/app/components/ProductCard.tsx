@@ -5,15 +5,15 @@ import Link from "next/link";
 import PillButton from "./Button";
 import { QuantityButton } from "./QuantityButton";
 import stringToUSCurrency from "../helpers/convertCurrency";
-import { useGrocerStore } from "../store/store";
+import { useVinaTeaStore } from "../store/store";
 
 export default function ProductCard({ product }: { product: Product }) {
   const [showQuantityButton, setShowQuantityButton] = useState(false);
-  const addToStore = useGrocerStore((state) => state.addToStore);
-  const setCart = useGrocerStore((state) => state.setCart);
-  const cart = useGrocerStore((state) => state.cart);
-  const getQuantityById = useGrocerStore((state) => state.getQuantityByProductId);
-  const isLoading = useGrocerStore((state) => state.isLoading);
+  const addToStore = useVinaTeaStore((state) => state.addToStore);
+  const setCart = useVinaTeaStore((state) => state.setCart);
+  const cart = useVinaTeaStore((state) => state.cart);
+  const getQuantityById = useVinaTeaStore((state) => state.getQuantityByProductId);
+  const isLoading = useVinaTeaStore((state) => state.isLoading);
 
   useEffect(() => {
     if (!isLoading && cart && cart.products.length > 0) {
@@ -64,7 +64,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         </Link>
         <div className="p-6">
-          <div className="font-bold mt-1">{`${stringToUSCurrency(
+          <div className="font-bold mt-1 tracking-wider">{`${stringToUSCurrency(
             product.price
           )}`}</div>
           <div className="text-gray-300 pt-1">
@@ -74,7 +74,7 @@ export default function ProductCard({ product }: { product: Product }) {
               <div className="text-green-800">Available</div>
             )}
           </div>
-          <div className="text-lg font-sans text-sand-400">{product.name}</div>
+          <div className="text-lg font-sans text-sand-400 font-semibold tracking-wide">{product.name}</div>
           <div className="mt-2">
             {showQuantityButton ? (
               <QuantityButton

@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Poppins } from "next/font/google";
 import LayoutProvider from "../providers/layoutProvider";
 import { useSession } from "next-auth/react";
-import { useGrocerStore } from "../store/store";
+import { useVinaTeaStore } from "../store/store";
 
 
 const poppins = Poppins({
@@ -13,8 +13,8 @@ const poppins = Poppins({
 
 export default function Layout({ children }: ComponentProps) {
   const { data: session, status } = useSession();
-  const setUser = useGrocerStore((state) => state.setUser);
-  const setCart = useGrocerStore((state) => state.setCart);
+  const setUser = useVinaTeaStore((state) => state.setUser);
+  const setCart = useVinaTeaStore((state) => state.setCart);
 
   useEffect(() => {
     if (status !== 'loading') {

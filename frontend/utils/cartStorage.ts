@@ -123,7 +123,7 @@ export function clearLocalCart() {
   localStorage.removeItem("cart");
 }
 
-export async function mergeCarts(localCart: Cart | null, dbCart: Cart, user: User, isAdding: boolean) {
+export async function mergeCarts(localCart: Cart | null, dbCart: Cart, user: NextAuthUser, isAdding: boolean) {
   // If there is a local cart, merge with database cart
   if (localCart && localCart.products.length > 0) {
     console.log("THERE ARE LOCAL CART and DB CART, MERGING...");
@@ -166,7 +166,7 @@ export async function mergeCarts(localCart: Cart | null, dbCart: Cart, user: Use
   }
 }
 
-export async function setLocalAndDbCart(cart: Cart, user: User) {
+export async function setLocalAndDbCart(cart: Cart, user: NextAuthUser) {
   // Clear local cart  
   clearLocalCart();
   // Set new local cart

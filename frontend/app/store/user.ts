@@ -1,4 +1,4 @@
-export function storeUser(user: User) {
+export function storeUser(user: NextAuthUser) {
     localStorage.setItem("user", JSON.stringify(user));
 }
 

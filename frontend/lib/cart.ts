@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export async function updateDBCart({ products, user }: { products: ProductInCart[], user: User }) {
+export async function updateDBCart({ products, user }: { products: ProductInCart[], user: NextAuthUser }) {
     // remove products with quantity 0
     products = products.filter((product) => product.quantity > 0);
 
@@ -40,7 +40,7 @@ export async function clearDBCart(accessToken: string) {
     }
 }
 
-export async function removeProductFromDB({ productId, user }: { productId: string, user: User }) {
+export async function removeProductFromDB({ productId, user }: { productId: string, user: NextAuthUser }) {
     const headers = {
         "Content-Type": "application/json",
         "auth-token": `${user.accessToken}`

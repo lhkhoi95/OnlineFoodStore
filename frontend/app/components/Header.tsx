@@ -2,27 +2,28 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
 import { CartIcon } from "./CartIcon";
-import { signOut } from "next-auth/react";
-import SearchBar from "./SearchBar";
-import { useGrocerStore } from "../store/store";
-import { clearLocalCart } from "@/utils/cartStorage";
-import logout from "@/lib/user";
+import { useVinaTeaStore } from "../store/store";
+import { HamburgerMenu } from "./HamburgerMenu";
+import handleLogout from "@/utils/user";
 
 const Header = () => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const user = useGrocerStore((state) => state.user);
+  const clearStore = useVinaTeaStore((state) => state.clearStore);
+  const user = useVinaTeaStore((state) => state.user);
 
-  const handleLogout = async (accessToken: string) => {
-    clearLocalCart();
-    // Blacklist the accessToken in the backend
-    await logout(accessToken);
-    // Sign out from the frontend
-    signOut();
-  };
+  async function logout(accessToken: string) {
+    try {
+      await handleLogout(accessToken);
+      // Clear the store
+      clearStore();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
-    <header className="bg-[#FCAE1E] text-[#333333] shadow-md shadow-amber-300 text-xl p-2 pl-4 pr-8 w-full">
-      <nav className="bg-[#FCAE1E] mx-3">
+    <header className="bg-[#1F2937] text-white shadow-md shadow-black-300 text-xl p-2 w-full">
+      <nav className="bg-[#1F2937] mx-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="">
             <Image
@@ -37,7 +38,7 @@ const Header = () => {
           </Link>
           <div className="flex items-center space-x-4">
             <div
-              className="relative hover:bg-amber-200 rounded-2xl p-2"
+              className="relative hover:bg-zinc-400 rounded-2xl p-2 sm:hidden lg:block"
               title={user ? "View Profile" : "Login"}
               onMouseEnter={() => {
                 setIsHovered(true);
@@ -48,22 +49,31 @@ const Header = () => {
             >
               <div className="hidden md:block">
                 {user ? (
-                  <div className="text-sm">
-                    <div className="mr-2 relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-[#8b5f42]">
-                      <span className="font-bold text-[#84593C] dark:text-gray-300">{user.name[0]}</span>
+                  <div className="text-sm relative">
+                    <div className="flex items-center justify-between">
+                      <Image
+                        src="/images/profile.png"
+                        alt="dummy-profile"
+                        loading="eager"
+                        width={40}
+                        height={40}
+                        className="rounded-full mr-2"
+                        priority
+                      />
+                      {user.name}
                     </div>
-                    {user.name}
+
                     {isHovered && (
-                      <div className="absolute top-[55px] right-0 bg-amber-500 rounded-md shadow-md p-2 text-sm w-[120px]">
+                      <div className="absolute top-[48px] right-0 bg-slate-500 rounded-md shadow-md p-2 text-sm w-[120px]">
                         <Link
                           href="/profile"
-                          className="block py-1 px-2 hover:bg-amber-200 w-full text-left"
+                          className="block py-1 px-2 hover:bg-zinc-400 w-full text-left rounded-md"
                         >
                           View Profile
                         </Link>
                         <button
-                          onClick={() => handleLogout(user.accessToken)}
-                          className="block py-1 px-2 hover:bg-amber-200 w-full text-left"
+                          onClick={() => logout(user.accessToken)}
+                          className="block py-1 px-2 hover:bg-zinc-400 w-full text-left rounded-md"
                         >
                           Logout
                         </button>
@@ -96,6 +106,10 @@ const Header = () => {
               </div>
             </div>
             <CartIcon />
+            <div className="lg:hidden">
+              <HamburgerMenu />
+            </div>
+
           </div>
         </div>
       </nav>
