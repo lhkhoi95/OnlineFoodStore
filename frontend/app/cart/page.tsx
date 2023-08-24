@@ -1,7 +1,10 @@
 import React from 'react'
+import { Cart } from '../components/Cart'
 
-export default function Cart() {
+export default function CartView() {
     return (
-        <div className='w-full'>All Items In Cart</div>
+        <div className='my-10 h-screen'>
+            <Cart />
+        </div>
     )
 }
