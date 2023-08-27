@@ -1,24 +1,68 @@
 "use client"
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
-
+import { useVinaTeaStore } from '../store/store';
+import { getProductById } from '@/lib/product';
+import { RemoveModal } from './Modal';
 
 export const CartItem = ({ item }: { item: ProductInCart }) => {
     const [product, setProduct] = useState<Product>();
+    const [quantity, setQuantity] = useState<number>(item.quantity);
+    const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [showModal, setShowModal] = useState(false);
+    const addToStore = useVinaTeaStore((state) => state.addToStore);
+    const setCart = useVinaTeaStore((state) => state.setCart);
 
-    async function getData() {
-        const res = await fetch(`http://localhost:3000/products/${item.productId}`);
-
-        if (!res.ok) {
-            // This will activate the closest `error.js` Error Boundary
-            throw new Error('Failed to fetch data')
+    async function handleChange(e: React.ChangeEvent<HTMLSelectElement>, product: Product) {
+        const value = parseInt(e.target.value);
+        setQuantity(value);
+        setIsUpdating(true);
+        if (value === item.quantity) {
+            console.log("NO CHANGE");
+            setIsUpdating(false);
+            return;
         }
+        if (value > item.quantity) {
+            console.log("ADDING TO CART")
+            addToStore([{
+                productId: product._id,
+                price: product.price,
+                quantity: value - item.quantity,
+            }]);
+        } else {
+            console.log("REMOVING FROM CART")
+            addToStore([{
+                productId: product._id,
+                price: product.price,
+                quantity: value - item.quantity,
+            }]);
+        }
+        await setCart();
+        setIsUpdating(false);
+    }
 
-        return res.json()
+    async function handleRemove() {
+        setShowModal(true);
+    }
+
+    // Hide modal on cancel
+    function handleCancel() {
+        setShowModal(false);
+    }
+
+    async function handleConfirm(product: Product) {
+        setIsUpdating(true);
+        addToStore([{
+            productId: product._id,
+            price: product.price,
+            quantity: -item.quantity,
+        }]);
+        await setCart();
+        setIsUpdating(false);
     }
 
     useEffect(() => {
-        getData().then((data) => {
+        getProductById(item.productId).then((data) => {
             setProduct(data);
         });
     }, [])
@@ -28,14 +72,37 @@ export const CartItem = ({ item }: { item: ProductInCart }) => {
     return (
         <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-                <Image src={product.image[0]} width={64} height={64} alt="Image by photographeeasia from Freepik" />
+                <Image
+                    src={product.image[0]}
+                    alt="Image by photographeeasia from Freepik"
+                    loading="eager"
+                    width={64}
+                    height={64}
+                    className="rounded-xl shadow-2xl hover:scale-110"
+                    priority
+                />
                 <div className="ml-4">
                     <h3 className="text-md md:text-lg font-semibold">{product.name}</h3>
                     <p className="text-gray-600">${product.price}</p>
-                    <input className="border w-12 text-center" type="text" name="quantity" id="quantityId" value={item.quantity} readOnly />
+                    <select className="border w-16 text-center" name="quantity" id="quantityId" value={quantity} onChange={
+                        (e) => handleChange(e, product)
+                    } disabled={isUpdating}>
+                        {[...Array(product.stock)].map((_, i) => (
+                            <option key={i + 1} value={i + 1}>{i + 1}</option>
+                        ))}
+                    </select>
                 </div>
             </div>
-            <button className="text-red-600 hover:underline">Remove</button>
+            <button className={`${isUpdating ? "text-gray-400" : "text-red-600"} hover:underline`}
+                disabled={isUpdating}
+                onClick={handleRemove}>Remove
+            </button>
+            {showModal && (
+                <RemoveModal
+                    onConfirm={() => handleConfirm(product)}
+                    onCancel={handleCancel}
+                />
+            )}
         </div>
     );
 };

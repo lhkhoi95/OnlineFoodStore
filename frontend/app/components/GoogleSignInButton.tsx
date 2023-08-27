@@ -13,7 +13,7 @@ export const GoogleSignInButton = () => {
         <button
             type="button"
             onClick={handleLoginWithGoogle}
-            className="w-full inline-flex justify-center items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring focus:ring-red-200 active:bg-red-600 disabled:opacity-25 transition"
+            className="w-full inline-flex justify-center items-center px-4 py-2 bg-[#84593C] border border-transparent rounded-full font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:outline-nonefocus:ring focus:ring-red-200 active:bg-red-600 disabled:opacity-25 transition"
         >
 
             <svg className="w-6 h-6 mr-2 -ml-1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">

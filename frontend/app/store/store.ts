@@ -1,11 +1,15 @@
 import { create } from 'zustand';
 import { getCartFromDB } from '@/lib/cart';
-import { addProductToCart, getLocalCart, isSameCart, mergeCarts, setLocalAndDbCart } from '@/utils/cartStorage';
+import { addProductToCart, getLocalCart, isSameCart, mergeCarts, setLocalAndDbCart, setLocalCart } from '@/utils/cartStorage';
+import stringToUSCurrency from '../helpers/convertCurrency';
 
 interface VinaTeaState {
     cart: Cart | null;
     isLoading: boolean;
     isAdding: boolean;
+    TAX_RATE: number;
+    getDeliveryFee: () => string;
+    getFinalTotal: () => string;
     setCart: () => Promise<void>;
     addToStore: (products: ProductInCart[]) => void;
     getQuantityByProductId: (productId: string) => number;
@@ -14,10 +18,29 @@ interface VinaTeaState {
     clearStore: () => void;
 }
 
+
 export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
     cart: null,
+    TAX_RATE: 0.0875,
     isLoading: true,
     isAdding: true,
+    getDeliveryFee: () => {
+        const cart = get().cart;
+        if (!cart) return stringToUSCurrency(0);
+        if (cart.currentTotal > 12) {
+            return stringToUSCurrency(0);
+        }
+        return stringToUSCurrency(5.99);
+    },
+    getFinalTotal: () => {
+        const cart = get().cart;
+        let deliveryFee: number = 5.99;
+        if (!cart) return stringToUSCurrency(0);
+        if (cart.currentTotal > 12) deliveryFee = 0;
+        const tax = cart.currentTotal * get().TAX_RATE;
+        const finalTotal = cart.currentTotal + tax + deliveryFee;
+        return stringToUSCurrency(finalTotal);
+    },
     setCart: async () => {
         set({ isLoading: true });
         const user = get().user;
@@ -30,6 +53,7 @@ export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
                 if (dbCart && dbCart.products.length > 0 && !isSameCart(localCart, dbCart)) {
                     const updatedCart = await mergeCarts(localCart, dbCart, user, get().isAdding);
                     set({ cart: updatedCart, isLoading: false });
+                    await setLocalAndDbCart(updatedCart, user);
                     console.log("USER IS LOGGED IN", "THERE IS DB CART && NOT SAME AS LOCAL CART", get().cart);
                 } else {
                     // If no cart in database, return local cart
@@ -47,6 +71,9 @@ export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
             }
         } else {
             set({ cart: localCart, isLoading: false });
+            if (localCart && localCart.products.length > 0) {
+                setLocalCart(localCart);
+            }
             console.log("USER IS NOT LOGGED IN", get().cart);
         }
     },

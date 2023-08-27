@@ -3,7 +3,7 @@ import { Cart } from '../components/Cart'
 
 export default function CartView() {
     return (
-        <div className='my-10 h-screen'>
+        <div>
             <Cart />
         </div>
     )

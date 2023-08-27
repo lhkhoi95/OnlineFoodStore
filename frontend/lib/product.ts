@@ -15,3 +15,11 @@ export default function getAllProducts() {
     return response;
 }
 
+export async function getProductById(productId: string) {
+    const res = await fetch(`http://localhost:3000/products/${productId}`);
+
+    if (!res.ok) {
+        throw new Error('Failed to fetch data')
+    }
+    return res.json()
+}

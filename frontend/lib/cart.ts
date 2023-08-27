@@ -94,7 +94,4 @@ export async function getCartFromDB(accessToken: string) {
         console.log(error);
         return null;
     }
-
-
-
 }

@@ -37,6 +37,7 @@ router.get("/", loginRequired, async (req, res) => {
   }
 });
 
+// ADD/REMOVE ITEMS FROM CART
 router.post("/", loginRequired, async (req, res) => {
   try {
     // VALIDATE PRODUCT ID

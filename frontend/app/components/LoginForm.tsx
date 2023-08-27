@@ -41,62 +41,39 @@ export const CredentialsForm = () => {
             )}
             <div></div>
             <div>
-                <label
-                    htmlFor="email"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Email
                 </label>
-                <input
-                    type="email"
-                    name="email"
-                    id="email"
+                <input type="email" name="email" id="email"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    placeholder="email@vinatea.com"
-                    value={formValues.email}
-                    onChange={(e) =>
+                    placeholder="email@vinatea.com" value={formValues.email} onChange={(e) =>
                         setFormValues({ ...formValues, email: e.target.value })
                     }
                     required
                 />
             </div>
             <div>
-                <label
-                    htmlFor="password"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
+                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Password
                 </label>
-                <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="••••••••"
+                <input type="password" name="password" id="password" placeholder="••••••••"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    value={formValues.password}
-                    minLength={8}
-                    onChange={(e) =>
+                    value={formValues.password} minLength={8} onChange={(e) =>
                         setFormValues({ ...formValues, password: e.target.value })
                     }
                     required
                 />
             </div>
-            <button
-                type="submit"
-                className={`w-full font-semibold text-xs text-white uppercase tracking-widest focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg px-5 py-2.5 text-center  ${isLoading
+            <button type="submit" className={`w-full font-semibold text-xs text-white uppercase tracking-widest focus:ring-4
+            focus:outline-none focus:ring-blue-300 rounded-full px-5 py-2.5 text-center ${isLoading
                     ? "bg-gray-700 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
-                    : "bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    }`}
-                disabled={isLoading}
-            >
+                    : "bg-[#84593C] hover:bg-[#6E4F34] focus:ring-[#966F4A] dark:bg-[#84593C] dark:hover:bg-[#6E4F34] dark:focus:ring-[#966F4A]"}`}
+                disabled={isLoading}>
                 Login to your account
             </button>
             <div className="text-sm font-medium text-gray-500 dark:text-gray-300">
                 Not registered?{" "}
-                <a
-                    href="#"
-                    className="text-blue-700 hover:underline dark:text-blue-500"
-                >
+                <a href="#" className="text-blue-700 hover:underline dark:text-blue-500">
                     Create account
                 </a>
             </div>
