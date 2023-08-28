@@ -26,7 +26,7 @@ export const CredentialsForm = () => {
                 setError("Invalid credentials");
             }
         } else {
-            window.location.href = "/";
+            window.location.href = "/order";
         }
         setIsLoading(false);
     };

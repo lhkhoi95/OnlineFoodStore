@@ -2,17 +2,17 @@
 import { usePathname } from "next/navigation";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { useSession } from "next-auth/react";
 
 const LayoutProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname: string = usePathname();
-  const sharedLayoutPages = ["/", "/about", "/cart"];
+  const sharedHeaderPages = ["/", "/about", "/cart", "/order"];
+  const sharedFooterPages = ["/about", "/cart", "/order"];
 
   return (
     <>
-      {sharedLayoutPages.includes(pathname) && <Header />}
+      {sharedHeaderPages.includes(pathname) && <Header />}
       {children}
-      {sharedLayoutPages.includes(pathname) && <Footer />}
+      {sharedFooterPages.includes(pathname) && <Footer />}
     </>
   );
 };

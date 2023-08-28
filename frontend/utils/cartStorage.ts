@@ -1,6 +1,14 @@
 import { calculateCartCount, calculateCartTotal } from "@/app/helpers/cart";
 import { clearDBCart, updateDBCart } from "@/lib/cart";
 
+export function getProductByIdInLocalCart(productId: string) {
+  const cart: ProductInCart[] =
+    JSON.parse(localStorage.getItem("cart") || "null") || [];
+  const index = cart.findIndex((prod) => prod.productId === productId);
+  if (index === -1) return null;
+  return cart[index];
+}
+
 function getTotal() {
   const cart: ProductInCart[] =
     JSON.parse(localStorage.getItem("cart") || "null") || [];
@@ -39,7 +47,7 @@ function getQuantityById(productId: string) {
 
 }
 
-export function addProductToCart(product: ProductInCart) {
+export function addProductToCart(product: ProductInCart, user: NextAuthUser | null) {
   try {
     // If cart is empty, create a new cart and add the product to that cart
     const cart: ProductInCart[] = JSON.parse(
@@ -61,11 +69,11 @@ export function addProductToCart(product: ProductInCart) {
         // Update quantity
         cart[index].quantity += product.quantity;
         localStorage.setItem("cart", JSON.stringify(cart));
-        // Delete the product from the cart if quantity is going to be 0.
-        // if (cart[index].quantity === 0) {
-        //   cart.splice(index, 1);
-        //   localStorage.setItem("cart", JSON.stringify(cart));
-        // }
+        // If User is not logged in, just remove the product from the cart if quantity is going to be 0.
+        if (cart[index].quantity === 0 && !user) {
+          cart.splice(index, 1);
+          localStorage.setItem("cart", JSON.stringify(cart));
+        }
       }
     }
   } catch (error) {

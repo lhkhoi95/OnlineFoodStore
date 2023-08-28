@@ -8,6 +8,7 @@ interface VinaTeaState {
     isLoading: boolean;
     isAdding: boolean;
     TAX_RATE: number;
+    calculateTax: () => string;
     getDeliveryFee: () => string;
     getFinalTotal: () => string;
     setCart: () => Promise<void>;
@@ -24,6 +25,11 @@ export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
     TAX_RATE: 0.0875,
     isLoading: true,
     isAdding: true,
+    calculateTax: () => {
+        const cart = get().cart;
+        const taxRate = get().TAX_RATE;
+        return stringToUSCurrency((cart?.currentTotal ?? 0) * taxRate);
+    },
     getDeliveryFee: () => {
         const cart = get().cart;
         if (!cart) return stringToUSCurrency(0);
@@ -41,6 +47,12 @@ export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
         const finalTotal = cart.currentTotal + tax + deliveryFee;
         return stringToUSCurrency(finalTotal);
     },
+    /*
+        Case 1: User is not logged in, use local cart.
+        Case 2: User is logged in, and there is a database cart, and two carts are different 
+            ==> merge local cart with database cart. Otherwise, use local cart.
+        Case 3: User is logged in, and there is no database cart ==> use local cart.
+    */
     setCart: async () => {
         set({ isLoading: true });
         const user = get().user;
@@ -49,14 +61,14 @@ export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
         if (user) {
             try {
                 const dbCart = await getCartFromDB(user.accessToken);
-                // If there is a cart in the database, merge with local cart
+                // CASE 2
                 if (dbCart && dbCart.products.length > 0 && !isSameCart(localCart, dbCart)) {
                     const updatedCart = await mergeCarts(localCart, dbCart, user, get().isAdding);
                     set({ cart: updatedCart, isLoading: false });
                     await setLocalAndDbCart(updatedCart, user);
                     console.log("USER IS LOGGED IN", "THERE IS DB CART && NOT SAME AS LOCAL CART", get().cart);
                 } else {
-                    // If no cart in database, return local cart
+                    // CASE 3
                     set({ cart: localCart, isLoading: false });
                     // Update database and localStorage carts
                     if (localCart && localCart.products.length > 0) {
@@ -70,6 +82,7 @@ export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
                 set({ cart: localCart, isLoading: false });
             }
         } else {
+            // CASE 1
             set({ cart: localCart, isLoading: false });
             if (localCart && localCart.products.length > 0) {
                 setLocalCart(localCart);
@@ -78,12 +91,13 @@ export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
         }
     },
     addToStore: (products) => {
+        const user = get().user;
         set({ isLoading: true });
         // ADD TO LOCAL STORAGE
         products.forEach((prod) => {
             if (prod.quantity < 0) set({ isAdding: false })
             else set({ isAdding: true })
-            addProductToCart(prod);
+            addProductToCart(prod, user);
         })
     },
     getQuantityByProductId: (productId) => {
@@ -94,6 +108,9 @@ export const useVinaTeaStore = create<VinaTeaState>((set, get) => ({
         return cart.products[index].quantity;
     },
     user: null,
-    setUser: (user) => set({ user }),
+    setUser: (user) => {
+        set({ isLoading: true });
+        set({ user, isLoading: false });
+    },
     clearStore: () => set({ user: null, cart: null, isLoading: true, isAdding: true }),
 }));

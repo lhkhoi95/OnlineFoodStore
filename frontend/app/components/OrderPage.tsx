@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import ProductCard from "./ProductCard";
-import ProductPageSkeleton from "@/app/loading";
+import ProductPageSkeleton from "@/app/order/loading";
 import getAllProducts from "@/lib/product";
 
-export const ProductsPage = () => {
+export const OrderPage = () => {
   const { data, error, isLoading } = getAllProducts();
   if (isLoading) return <ProductPageSkeleton />;
   if (error) throw new Error("Failed to load products");

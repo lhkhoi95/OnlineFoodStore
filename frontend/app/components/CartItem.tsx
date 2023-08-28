@@ -4,14 +4,17 @@ import React, { useEffect, useState } from 'react'
 import { useVinaTeaStore } from '../store/store';
 import { getProductById } from '@/lib/product';
 import { RemoveModal } from './Modal';
+import { getProductByIdInLocalCart } from '@/utils/cartStorage';
+import stringToUSCurrency from '../helpers/convertCurrency';
 
 export const CartItem = ({ item }: { item: ProductInCart }) => {
     const [product, setProduct] = useState<Product>();
     const [quantity, setQuantity] = useState<number>(item.quantity);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState<boolean>(false);
     const addToStore = useVinaTeaStore((state) => state.addToStore);
     const setCart = useVinaTeaStore((state) => state.setCart);
+    const user = useVinaTeaStore((state) => state.user);
 
     async function handleChange(e: React.ChangeEvent<HTMLSelectElement>, product: Product) {
         const value = parseInt(e.target.value);
@@ -52,13 +55,16 @@ export const CartItem = ({ item }: { item: ProductInCart }) => {
 
     async function handleConfirm(product: Product) {
         setIsUpdating(true);
+        // If user is logged in, remove from local cart and update db
         addToStore([{
             productId: product._id,
             price: product.price,
             quantity: -item.quantity,
         }]);
+
         await setCart();
         setIsUpdating(false);
+        setShowModal(false);
     }
 
     useEffect(() => {
@@ -81,9 +87,9 @@ export const CartItem = ({ item }: { item: ProductInCart }) => {
                     className="rounded-xl shadow-2xl hover:scale-110"
                     priority
                 />
-                <div className="ml-4">
+                <div className="h-fit ml-4">
                     <h3 className="text-md md:text-lg font-semibold">{product.name}</h3>
-                    <p className="text-gray-600">${product.price}</p>
+                    <p className="text-gray-600">{stringToUSCurrency(product.price)}</p>
                     <select className="border w-16 text-center" name="quantity" id="quantityId" value={quantity} onChange={
                         (e) => handleChange(e, product)
                     } disabled={isUpdating}>
@@ -93,7 +99,7 @@ export const CartItem = ({ item }: { item: ProductInCart }) => {
                     </select>
                 </div>
             </div>
-            <button className={`${isUpdating ? "text-gray-400" : "text-red-600"} hover:underline`}
+            <button type="button" className={`${isUpdating ? "text-gray-400" : "text-red-600"} hover:underline`}
                 disabled={isUpdating}
                 onClick={handleRemove}>Remove
             </button>
