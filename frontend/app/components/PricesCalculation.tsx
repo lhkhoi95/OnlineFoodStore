@@ -37,7 +37,7 @@ export const PricesCalculation = () => {
                 </h3>
                 <p className="tracking-wide font-semibold">{getDeliveryFee()}</p>
             </div>
-            <hr className="mt-2 w-full ml-auto" />
+            <hr className="mt-6 w-full ml-auto" />
             <div className="flex justify-between items-center mt-2">
                 <h3 className="text-lg font-semibold">Total</h3>
                 <p className="text-lg tracking-wide font-semibold">{getFinalTotal()}</p>

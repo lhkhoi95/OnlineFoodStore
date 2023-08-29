@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { useVinaTeaStore } from '../store/store';
 import { getProductById } from '@/lib/product';
 import { RemoveModal } from './Modal';
-import { getProductByIdInLocalCart } from '@/utils/cartStorage';
 import stringToUSCurrency from '../helpers/convertCurrency';
 
 export const CartItem = ({ item }: { item: ProductInCart }) => {
@@ -14,7 +13,6 @@ export const CartItem = ({ item }: { item: ProductInCart }) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const addToStore = useVinaTeaStore((state) => state.addToStore);
     const setCart = useVinaTeaStore((state) => state.setCart);
-    const user = useVinaTeaStore((state) => state.user);
 
     async function handleChange(e: React.ChangeEvent<HTMLSelectElement>, product: Product) {
         const value = parseInt(e.target.value);

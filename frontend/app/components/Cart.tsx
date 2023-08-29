@@ -27,7 +27,7 @@ export const Cart = () => {
                         ))}
                         <PricesCalculation />
                         {user && (
-                            <button className="w-full mt-6 py-2 bg-[#84593C] focus:ring-[#966F4A] dark:bg-[#84593C] dark:hover:bg-[#6E4F34] dark:focus:ring-[#966F4A] text-white rounded-full">
+                            <button type="button" className="w-full mt-6 py-2 bg-[#84593C] focus:ring-[#966F4A] dark:bg-[#84593C] dark:hover:bg-[#6E4F34] dark:focus:ring-[#966F4A] text-white rounded-full">
                                 Checkout
                             </button>
                         )}
