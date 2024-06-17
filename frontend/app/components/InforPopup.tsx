@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const InforPopup = ({ text }: { text: string }) => {
+export const InfoPopup = ({ text }: { text: string }) => {
     return (
         <div className="absolute bg-[#E6CAB1] p-2 rounded-md shadow text-xs font-light">
             {text}

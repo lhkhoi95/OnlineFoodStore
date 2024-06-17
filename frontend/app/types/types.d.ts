@@ -24,6 +24,7 @@ type Product = {
 }
 
 type ProductInCart = {
+  name?: string,
   productId: string,
   price: number,
   quantity: number,
@@ -47,3 +48,8 @@ type QuantityButtonProps = {
   product: Product,
   showQuantityButton: React.Dispatch<React.SetStateAction<any>>,
 };
+
+interface LineItem {
+  price?: string | undefined;
+  quantity?: number | undefined;
+}

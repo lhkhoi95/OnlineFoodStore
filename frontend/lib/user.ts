@@ -6,7 +6,6 @@ export async function logout(accessToken: string) {
             "auth-token": `${accessToken}`
         }
         const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {}, { headers: headers });
-        console.log(data);
     } catch (error) {
         console.log(error);
         throw new Error("Failed to logout");

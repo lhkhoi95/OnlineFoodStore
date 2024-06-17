@@ -1,6 +1,5 @@
 import { getUserByEmail, loginWithProvider } from "@/lib/user";
 import axios, { AxiosResponse } from "axios";
-import Cookies from "js-cookie";
 import { AuthOptions as NextAuthOptions, User } from "next-auth/core/types";
 import NextAuth from "next-auth/next";
 import Credentials from "next-auth/providers/credentials";

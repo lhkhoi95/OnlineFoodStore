@@ -40,3 +40,7 @@ jspm_packages
 #Excluding build directory
 # public/
 
+# API keys
+api/.env
+
+frontend/.env.local
