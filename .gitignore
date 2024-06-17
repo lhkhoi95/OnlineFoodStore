@@ -44,4 +44,4 @@ jspm_packages
 api/.env
 
 frontend/.env.local
-frontend/.next
+frontend/.next*
